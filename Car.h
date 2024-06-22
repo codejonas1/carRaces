@@ -5,7 +5,8 @@
 #include <unistd.h> 
 #include <vector>
 #include "carCords.h"
-#include <mutex> 
+#include <mutex>
+#include <condition_variable>
 
 class Car{
   
@@ -14,8 +15,9 @@ public:
     std::vector<carCords> &pos;
     int delay;
     float velocity;
+    int &counter;
 
-    Car(int id, std::vector<carCords> &positions);
+    Car(int id, int &counter, std::vector<carCords> &positions);
 
     int randDelay();
     float randVelocity();

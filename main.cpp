@@ -6,6 +6,7 @@
 
 bool stillGenerate = true;
 bool stillShow = true;
+int counter = 0;
 std::vector<carCords> positions;
 std::vector<std::thread> ThreadVector;
 
@@ -152,9 +153,9 @@ void carRaces(){
 
     int id=0;
 
-    Car firstCar = Car(id++, positions);
-    Car secondCar = Car(id++, positions);
-    Car thirdCar = Car(id++, positions);
+    Car firstCar = Car(id++, counter, positions);
+    Car secondCar = Car(id++, counter, positions);
+    Car thirdCar = Car(id++, counter, positions);
 
     ThreadVector.push_back(std::thread(&Car::rideInf, firstCar));
     ThreadVector.push_back(std::thread(&Car::rideInf, secondCar));
@@ -165,7 +166,7 @@ void carRaces(){
         cc.y = 60;
         positions.push_back(cc);
 
-        Car car = Car(id, positions);
+        Car car = Car(id, counter, positions);
     
         ThreadVector.push_back(std::thread(&Car::rideLaps, car));    
         std::this_thread::sleep_for(std::chrono::seconds(5));
