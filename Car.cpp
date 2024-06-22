@@ -38,12 +38,13 @@ void Car::rideLaps(){
             else if (meter >= 400 && meter < 500)
                 pos[this->id].y += this->velocity;
             else if (meter >= 500 && meter < 900){
-                if(!isOn3Track) counter++;
-                isOn3Track = true;
-                
                 // lock release
                 std::lock_guard<std::mutex> lock(mtx);
                 data_ready = false;
+                
+                if(!isOn3Track) counter++;
+                isOn3Track = true;
+                
                 pos[this->id].x -= this->velocity;
             }
             else if (meter >= 900){
@@ -55,7 +56,7 @@ void Car::rideLaps(){
 
             if(counter == 0){
                 data_ready = true;
-                cv.notify_one();
+                cv.notify_all();
             }
         }
     }
