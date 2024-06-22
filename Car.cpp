@@ -3,7 +3,7 @@
 
 std::mutex mtx;
 std::condition_variable cv;
-bool data_ready = false;
+bool data_ready = true;
 
 Car::Car(int id, int &counter, std::vector<carCords> &positions) 
 :counter(counter), pos(positions){
@@ -38,7 +38,7 @@ void Car::rideLaps(){
             else if (meter >= 400 && meter < 500)
                 pos[this->id].y += this->velocity;
             else if (meter >= 500 && meter < 900){
-                if(!isOn3Track) counter += 1;
+                if(!isOn3Track) counter++;
                 isOn3Track = true;
                 
                 // lock release
@@ -47,13 +47,15 @@ void Car::rideLaps(){
                 pos[this->id].x -= this->velocity;
             }
             else if (meter >= 900){
-                if(isOn3Track) counter -= 1;
+                if(isOn3Track) counter--;
                 isOn3Track = false;
 
+                pos[this->id].y -= this->velocity;
+            }
+
+            if(counter == 0){
                 data_ready = true;
                 cv.notify_one();
-
-                pos[this->id].y -= this->velocity;
             }
         }
     }
@@ -90,17 +92,14 @@ void Car::rideInf(){
                 meter += this->velocity;
             }
             else if (meter >= 100 && meter < 500){
-                if(counter > 0 && (pos[this->id].y > 16 && pos[this->id].y < 18)){
+                if(pos[this->id].y > 16 && pos[this->id].y < 18){
                     // locking
                     std::unique_lock<std::mutex> lock(mtx);
-
                     // waiting
                     cv.wait(lock, [] { return data_ready; });
-
-                }else{
-                    pos[this->id].y += this->velocity;
-                    meter += this->velocity;
-                }   
+                }
+                pos[this->id].y += this->velocity;
+                meter += this->velocity;
             }
             else if (meter >= 500 && meter < 600){
                 pos[this->id].x -= this->velocity;
